@@ -1,18 +1,21 @@
-version: '3.8'
-
 services:
   # MLflow Tracking Server
   mlflow_ui:
     build: .
     ports:
       - "5000:5000"
-    command: mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./artifacts
+    command: >
+      mlflow server 
+      --host 0.0.0.0 
+      --port 5000 
+      --backend-store-uri ${MLFLOW_DB_URL}
+      --default-artifact-root ./artifacts
 
   # Airflow Scheduler & Webserver (Simplified for Dev)
   airflow:
     build: .
     volumes:
-      - ./dags:/app/dags
+      - ./airflow/dags:/app/dags
     environment:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - SUPABASE_URL=${SUPABASE_URL}

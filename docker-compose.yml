@@ -18,6 +18,7 @@ services:
       - ./airflow/dags:/app/dags
     environment:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      
       - SUPABASE_URL=${SUPABASE_URL}
       - SUPABASE_KEY=${SUPABASE_KEY}
       - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
@@ -30,6 +31,8 @@ services:
     build: .
     environment:
       - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
       - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
+    command: python data-pipeline/scripts/create_tables.py # Example entrypoint
     depends_on:
       - mlflow_ui

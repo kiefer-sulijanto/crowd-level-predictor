@@ -17,4 +17,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 4. Copy the rest of the code (Changes often, but it's fast)
 COPY . .
 
-CMD ["python", "main.py"]
+# 5. Create a non-root user (Security Best Practice)
+RUN useradd -m appuser && chown -R appuser /app
+USER appuser
+
+# Use a default CMD that can be easily overridden
+CMD ["python", "-c", "print('No default entry point defined. Use docker-compose to specify commands.')"]

@@ -1,0 +1,42 @@
+name: Crowd Predictor CI/CD
+
+on:
+    push:
+        branches: [main]
+
+jobs:
+    build-and-test:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Set up Python
+              uses: actions/setup-python@v4
+              with:
+                  python-version: "3.13"
+
+            - name: Install dependencies
+              run: |
+                  pip install -r requirements.txt
+                  pip install pytest
+
+            - name: Run Tests
+              run: pytest
+
+    deploy:
+        needs: build-and-test
+        runs-on: self-hosted
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Pull latest changes
+              run: git pull origin main
+
+            - name: Restart Docker Services
+              env:
+                  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+                  SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+                  MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+              run: docker-compose up -d --build

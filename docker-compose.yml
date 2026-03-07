@@ -1,4 +1,18 @@
 services:
+  # Backend API Server
+  backend:
+    build: .
+    volumes:
+      - ./src/backend:/app/src/backend
+    environment:
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
+    ports:
+      - "8000:8000"
+    command: uvicorn src.backend.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - mlflow_ui
   # MLflow Tracking Server
   mlflow_ui:
     build: .

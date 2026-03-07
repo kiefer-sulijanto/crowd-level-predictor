@@ -1,3 +1,5 @@
+fastapi
+uvicorn
 apache-airflow
 mlflow
 sqlalchemy

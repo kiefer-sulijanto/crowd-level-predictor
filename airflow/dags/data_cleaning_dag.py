@@ -29,7 +29,7 @@ def inline_feature_engineering():
 
     # 3. Saving
     print(f"Uploading processed features to 'features' table...")
-    df_features.to_sql("features", engine, if_exists="replace", index=False)
+    df_features.to_sql("features", engine, if_exists="append", index=False)
     print("Pipeline execution successful!")
 
 

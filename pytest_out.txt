@@ -1,0 +1,23 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.0.2, pluggy-1.6.0
+rootdir: D:\AAQTxDAC\Crowd-Level-Predictor-DSA-Industry-Project-
+plugins: anyio-4.11.0, Faker-38.2.0, langsmith-0.4.43
+collected 0 items / 1 error
+
+=================================== ERRORS ====================================
+___________________ ERROR collecting tests/test_backend.py ____________________
+ImportError while importing test module 'D:\AAQTxDAC\Crowd-Level-Predictor-DSA-Industry-Project-\tests\test_backend.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_backend.py:1: in <module>
+    from src.backend.main import app
+src\backend\main.py:10: in <module>
+    import mlflow
+E   ModuleNotFoundError: No module named 'mlflow'
+=========================== short test summary info ===========================
+ERROR tests/test_backend.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+============================== 1 error in 0.96s ===============================

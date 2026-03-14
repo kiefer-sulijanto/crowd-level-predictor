@@ -7,7 +7,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import pandas as pd
 import numpy as np
-import mlflow
 
 # Global variable to store the model
 model = None
@@ -34,7 +33,6 @@ async def lifespan(app: FastAPI):
         print(f"Successfully loaded model from {MODEL_PATH}")
     except FileNotFoundError:
         print(f"Warning: Could not load model. File '{MODEL_PATH}' not found.")
-        print(f"Warning: Could not load model from MLflow: {e}")
         print("The server will start without a model.")
 
     yield
@@ -44,7 +42,7 @@ async def lifespan(app: FastAPI):
 
 
 # ── App setup ──────────────────────────────────────────────────────────────
-app = FastAPI(title="MakanMap Crowdedness API", lifespan=lifespan)
+app = FastAPI(title="Crowd Level Predictor API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -229,12 +227,9 @@ async def predict(request: PredictionRequest):
 
 @app.get("/health")
 async def health_check():
-    return {
-        "status": "healthy",
-        "model_loaded": model is not None,
-    }
+    return {"status": "healthy"}
 
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to the MakanMap Crowdedness API"}
+    return {"message": "Welcome to the Crowd Level Predictor API"}

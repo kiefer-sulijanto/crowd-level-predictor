@@ -1,4 +1,4 @@
-from src.backend.main import app
+from src.backend.another_backend_api import app
 from fastapi.testclient import TestClient
 
 client = TestClient(app)

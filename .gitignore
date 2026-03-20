@@ -5,5 +5,8 @@ node_modules/
 __pycache__/
 *.pyc
 
-# Env
+# Environment
 .env
+
+# Mac
+.DS_Store

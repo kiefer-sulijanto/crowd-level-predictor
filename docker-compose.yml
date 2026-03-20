@@ -11,7 +11,7 @@ services:
       - MODEL_PATH=ml/models/Gradient_Boosting_Regressor.pkl
     ports:
       - "8000:8000"
-    command: uvicorn backend.src.predict_api:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn backend.src.another_backend_api:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
       - mlflow_ui
 
@@ -54,3 +54,4 @@ services:
     ports:
       - "8080:8080"
     command: airflow standalone
+

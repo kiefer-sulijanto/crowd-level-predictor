@@ -20,21 +20,29 @@ app.add_middleware(
 )
 
 # ── Load model once at startup ─────────────────────────────────────────────
-MODEL_PATH = os.getenv("MODEL_PATH", "model.pkl")
+MODEL_PATH = os.getenv("MODEL_PATH", "Gradient_Boosting_Regressor.pkl")
 
 try:
     model = joblib.load(MODEL_PATH)
     print(f"Model loaded from {MODEL_PATH}")
 except FileNotFoundError:
-    raise RuntimeError(f"Model file not found at '{MODEL_PATH}'. Train and save the model first.")
+    raise RuntimeError(
+        f"Model file not found at '{MODEL_PATH}'. Train and save the model first."
+    )
 
 # ── Constants ──────────────────────────────────────────────────────────────
 VALID_WEATHER = {"rainy", "cloudy", "night_clear", "clear"}
 
 DAY_NAMES = {
-    0: "Monday", 1: "Tuesday", 2: "Wednesday",
-    3: "Thursday", 4: "Friday", 5: "Saturday", 6: "Sunday"
+    0: "Monday",
+    1: "Tuesday",
+    2: "Wednesday",
+    3: "Thursday",
+    4: "Friday",
+    5: "Saturday",
+    6: "Sunday",
 }
+
 
 def get_time_block(hour: int) -> str:
     """
@@ -54,8 +62,9 @@ def get_time_block(hour: int) -> str:
     else:
         raise HTTPException(
             status_code=400,
-            detail=f"Hour {hour} is outside operating hours (6am–10pm)."
+            detail=f"Hour {hour} is outside operating hours (6am–10pm).",
         )
+
 
 class PredictionRequest(BaseModel):
     location_id: str
@@ -76,16 +85,19 @@ class PredictionRequest(BaseModel):
 
     bins_ahead: int = Field(6, ge=1, le=12)
 
+
 class BinPrediction(BaseModel):
-    time_bin: str            # ISO timestamp
-    time_block: str          # Morning / Afternoon / Evening / Night
-    day_name: str            # Monday … Sunday
-    crowdedness_score: float # 0.0 – 1.0
-    crowd_label: str         # Low / Medium / High
+    time_bin: str  # ISO timestamp
+    time_block: str  # Morning / Afternoon / Evening / Night
+    day_name: str  # Monday … Sunday
+    crowdedness_score: float  # 0.0 – 1.0
+    crowd_label: str  # Low / Medium / High
+
 
 class PredictionResponse(BaseModel):
     location_id: str
     predictions: list[BinPrediction]
+
 
 # ── Helper: build feature rows for future time bins ────────────────────────
 def build_future_rows(request: PredictionRequest) -> pd.DataFrame:
@@ -103,36 +115,39 @@ def build_future_rows(request: PredictionRequest) -> pd.DataFrame:
 
     rows = []
     for i in range(request.bins_ahead):
-        ts   = start + timedelta(minutes=30 * i)
+        ts = start + timedelta(minutes=30 * i)
         hour = ts.hour
-        dow  = ts.weekday()
+        dow = ts.weekday()
 
         # Skip bins outside operating hours
         if not (6 <= hour <= 22):
             continue
 
-        rows.append({
-            "time_bin":          ts,
-            # Numeric
-            "temperature":       request.temperature,
-            "humidity":          request.humidity,
-            "is_weekend":        int(dow >= 5),
-            "is_public_holiday": request.is_public_holiday,
-            "location_freq":     request.location_freq,
-            # Categorical
-            "weather":           request.weather,
-            "location_id":       request.location_id,
-            "time_block":        get_time_block(hour),
-            "day_name":          DAY_NAMES[dow],
-        })
+        rows.append(
+            {
+                "time_bin": ts,
+                # Numeric
+                "temperature": request.temperature,
+                "humidity": request.humidity,
+                "is_weekend": int(dow >= 5),
+                "is_public_holiday": request.is_public_holiday,
+                "location_freq": request.location_freq,
+                # Categorical
+                "weather": request.weather,
+                "location_id": request.location_id,
+                "time_block": get_time_block(hour),
+                "day_name": DAY_NAMES[dow],
+            }
+        )
 
     if not rows:
         raise HTTPException(
             status_code=400,
-            detail="All forecast bins fall outside operating hours (6am–10pm). Try again later."
+            detail="All forecast bins fall outside operating hours (6am–10pm). Try again later.",
         )
 
     return pd.DataFrame(rows)
+
 
 # ── Helper: map model output to 0–1 score + label ─────────────────────────
 def score_and_label(predictions, df_future):
@@ -143,7 +158,7 @@ def score_and_label(predictions, df_future):
 
         score = float(pred) * 3
 
-        score += row["location_freq"] / 20000 
+        score += row["location_freq"] / 20000
         score += 0.1 if row["time_block"] == "Afternoon" else 0
         score += 0.15 if row["is_weekend"] else 0
 
@@ -159,6 +174,7 @@ def score_and_label(predictions, df_future):
         results.append((round(score, 2), label))
 
     return results
+
 
 # ── Endpoint ───────────────────────────────────────────────────────────────
 @app.post("/predict", response_model=PredictionResponse)
@@ -196,27 +212,39 @@ def predict(request: PredictionRequest):
     df_future = build_future_rows(request)
 
     # Must match exact column order the model was trained on
-    num_cols = ["temperature", "humidity", "is_weekend", "is_public_holiday", "location_freq"]
+    num_cols = [
+        "temperature",
+        "humidity",
+        "is_weekend",
+        "is_public_holiday",
+        "location_freq",
+    ]
     cat_cols = ["weather", "location_id", "time_block", "day_name"]
     X = df_future[num_cols + cat_cols]
 
     raw_preds = model.predict(X)
-    scored    = score_and_label(raw_preds, df_future)
+    scored = score_and_label(raw_preds, df_future)
 
     predictions = [
         BinPrediction(
-            time_bin =         df_future["time_bin"].iloc[i].isoformat(),
-            time_block =       df_future["time_block"].iloc[i],
-            day_name =         df_future["day_name"].iloc[i],
+            time_bin=df_future["time_bin"].iloc[i].isoformat(),
+            time_block=df_future["time_block"].iloc[i],
+            day_name=df_future["day_name"].iloc[i],
             crowdedness_score=scored[i][0],
-            crowd_label =      scored[i][1],
+            crowd_label=scored[i][1],
         )
         for i in range(len(scored))
     ]
 
     return PredictionResponse(location_id=request.location_id, predictions=predictions)
 
+
 # ── Health check ───────────────────────────────────────────────────────────
 @app.get("/health")
 def health():
     return {"status": "ok", "model_loaded": model is not None}
+
+
+@app.get("/")
+def root():
+    return {"message": "MakanMap Crowdedness API is running"}

@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIM-DAC Handover - Crowdedness Predictor</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        
+        .header {
+            text-align: center;
+            padding-bottom: 30px;
+            border-bottom: 3px solid #2c3e50;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        
+        
+        .project-info {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+            margin: 20px 0;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        
+        .dataset-info {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .model-card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .task-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .task-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        
+        .highlight {
+            background-color: #fffde7;
+            padding: 5px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        
+        .warning {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .code-block {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #666;
+        }
+        
+        @media print {
+            body {
+                background-color: white;
+                font-size: 12pt;
+            }
+            
+            .container {
+                box-shadow: none;
+                padding: 0;
+            }
+            
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>SIM-DAC Handover Document</h1>
+            <h2>Crowdedness Prediction System for Food Courts</h2>
+            <p><strong>Project:</strong> MakanMap Crowdedness Predictor</p>
+            <p><strong>Date:</strong> 14 January 2026</span></p>
+        </div>
+        
+        <div class="section">
+            <h2>Project Overview</h2>
+            <div class="project-info">
+                <p><strong>Objective:</strong> Develop a machine learning system to predict crowdedness levels at various food court locations in Singapore.</p>
+                <p><strong>Business Value:</strong> Help users plan their visits to avoid peak hours, optimize food court operations, and provide real-time crowdedness insights.</p>
+                <p><strong>Success Metrics:</strong></p>
+                <ul>
+                    <li>Prediction accuracy > 85%</li>
+                    <li>Model inference time < 100ms</li>
+                    <li>System uptime > 99%</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Dataset Information</h2>
+            
+            <div class="dataset-info">
+                <h3>Generated Mock Data</h3>
+                <p>We've generated synthetic data that mimics real-world QR code scanning patterns at 20 food court locations across Singapore.</p>
+            </div>
+            
+            <h3>Available Files:</h3>
+            <table>
+                <tr>
+                    <th>File Name</th>
+                    <th>Description</th>
+                    <th>Records</th>
+                    <th>Purpose</th>
+                </tr>
+                <tr>
+                    <td><code>event_level_data_clean.csv</code></td>
+                    <td>Clean event-level data (individual scans)</td>
+                    <td>~200,000</td>
+                    <td>Primary training data</td>
+                </tr>
+                <tr>
+                    <td><code>event_level_data_dirty.csv</code></td>
+                    <td>Dirty version with data quality issues</td>
+                    <td>~204,000</td>
+                    <td>Test data cleaning pipeline</td>
+                </tr>
+            </table>
+            
+            <h3>Data Dictionary:</h3>
+            <table>
+                <tr>
+                    <th>Variable</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Example</th>
+                </tr>
+                <tr>
+                    <td><code>record_id</code></td>
+                    <td>Integer</td>
+                    <td>Primary key for each scan event</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td><code>timestamp</code></td>
+                    <td>Datetime</td>
+                    <td>Exact time of QR code scan</td>
+                    <td>2025-01-12 13:30:00</td>
+                </tr>
+                <tr>
+                    <td><code>day_of_week</code></td>
+                    <td>Integer</td>
+                    <td>0=Monday … 6=Sunday</td>
+                    <td>6</td>
+                </tr>
+                <tr>
+                    <td><code>hour_of_day</code></td>
+                    <td>Integer</td>
+                    <td>Hour of day, 0–23</td>
+                    <td>13</td>
+                </tr>
+                <tr>
+                    <td><code>is_weekend</code></td>
+                    <td>Boolean</td>
+                    <td>True if Saturday/Sunday</td>
+                    <td>true</td>
+                </tr>
+                <tr>
+                    <td><code>is_public_holiday</code></td>
+                    <td>Boolean</td>
+                    <td>Based on holiday list</td>
+                    <td>false</td>
+                </tr>
+                <tr>
+                    <td><code>lat</code></td>
+                    <td>Float</td>
+                    <td>Latitude of the stall</td>
+                    <td>1.280884</td>
+                </tr>
+                <tr>
+                    <td><code>long</code></td>
+                    <td>Float</td>
+                    <td>Longitude of the stall</td>
+                    <td>103.869885</td>
+                </tr>
+                <tr>
+                    <td><code>weather</code></td>
+                    <td>String</td>
+                    <td>Weather category</td>
+                    <td>"rainy"</td>
+                </tr>
+                <tr>
+                    <td><code>temperature</code></td>
+                    <td>Float</td>
+                    <td>Degrees Celsius</td>
+                    <td>29.4</td>
+                </tr>
+                <tr>
+                    <td><code>humidity</code></td>
+                    <td>Float</td>
+                    <td>Percentage humidity</td>
+                    <td>85.1</td>
+                </tr>
+                <tr>
+                    <td><code>location_id</code></td>
+                    <td>Integer</td>
+                    <td>Location identifier</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td><code>location_name</code></td>
+                    <td>String</td>
+                    <td>Location name</td>
+                    <td>"SEMBAWANG EATING HOUSE"</td>
+                </tr>
+            </table>
+            
+            <div class="warning">
+                <h4>Important Notes:</h4>
+                <ul>
+                    <li>Data spans from <strong>Jan 1, 2025 to Jun 30, 2025</strong></li>
+                    <li>Operating hours: <strong>6 AM to 10 PM daily</strong></li>
+                    <li>Weather data is synthetic but informed by real Singapore API data</li>
+                    <li>Dirty dataset contains 13 types of data quality issues for testing cleaning pipelines</li>
+                    <li>Aggregation of data is allowed for feature engineering/creating new features Eg: Grouping scan records to 15 minute timeframes</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Data Cleaning Pipeline</h2>
+            <p>Before model development, the team must create a robust data cleaning pipeline to handle:</p>
+            
+            <div class="card">
+                <h3>Data Quality Issues Present:</h3>
+                <ul>
+                    <li><strong>Missing values (5%)</strong> - Random NaN values</li>
+                    <li><strong>Outliers (3%)</strong> - Extreme values in numeric columns</li>
+                    <li><strong>Duplicates (2%)</strong> - Duplicate rows</li>
+                    <li><strong>Data type errors (4%)</strong> - Numeric values converted to strings</li>
+                    <li><strong>Inconsistent casing (10%)</strong> - Mixed cases in text columns</li>
+                    <li><strong>Timezone mix (2%)</strong> - Timezone annotations added</li>
+                    <li><strong>Unit mismatches (3%)</strong> - Temperature in Fahrenheit</li>
+                    <li><strong>Geographic errors (2%)</strong> - Swapped lat/long coordinates</li>
+                    <li><strong>Logical errors (4%)</strong> - Inconsistent day_of_week and is_weekend</li>
+                    <li><strong>Column rename issues (30% chance)</strong> - Random column names</li>
+                    <li><strong>Whitespace issues (15%)</strong> - Extra spaces in text</li>
+                    <li><strong>Special character errors (8%)</strong> - Random special characters</li>
+                    <li><strong>Operating hour violations (1%)</strong> - Records outside 6 AM - 10 PM</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Exploratory Data Analysis (EDA) Requirements</h2>
+            <p>Perform comprehensive EDA to understand patterns and inform feature engineering:</p>
+            
+            <ul class="task-list">
+                <li><strong>Temporal Analysis:</strong> Hourly, daily, weekly patterns</li>
+                <li><strong>Location Analysis:</strong> Busiest locations, geographic patterns</li>
+                <li><strong>Weather Impact:</strong> Correlation between weather and crowdedness</li>
+                <li><strong>Holiday Effects:</strong> Impact of public holidays and weekends</li>
+                <li><strong>Cross-feature Analysis:</strong> Interactions between time, location, weather</li>
+                <li><strong>Anomaly Detection:</strong> Identify unusual patterns</li>
+                <li><strong>Seasonality Analysis:</strong> Monthly and seasonal trends</li>
+            </ul>
+            
+            <p>Create visualizations for:</p>
+            <ul>
+                <li>Heatmaps of crowdedness by time and location</li>
+                <li>Time series decomposition</li>
+                <li>Correlation matrices</li>
+                <li>Geographic distribution maps</li>
+                <li>Feature importance plots</li>
+                <li>Extra visualizations are also welcome!</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>Machine Learning Tasks</h2>
+            <p>We need to explore multiple approaches to predict crowdedness. The types of models used are up to the team's discretion:</p>
+            
+            <div class="model-grid">
+                <div class="model-card">
+                    <h3>Classification Approach</h3>
+                    <p><strong>Target:</strong> Predict crowdedness level (Low, Medium, High)</p>
+                    <p><strong>Models to try:</strong></p>
+                    <ul>
+                        <li>Random Forest Classifier</li>
+                        <li>XGBoost Classifier</li>
+                        <li>LightGBM Classifier</li>
+                        <li>Neural Network (MLP)</li>
+                        <li>Ensemble methods</li>
+                    </ul>
+                    <p><strong>Metrics:</strong> Accuracy, Precision, Recall, F1-Score, ROC-AUC</p>
+                </div>
+                
+                <div class="model-card">
+                    <h3>Regression Approach</h3>
+                    <p><strong>Target:</strong> Predict number of scans or crowdedness score (0-1)</p>
+                    <p><strong>Models to try:</strong></p>
+                    <ul>
+                        <li>Gradient Boosting Regressor</li>
+                        <li>Random Forest Regressor</li>
+                        <li>XGBoost Regressor</li>
+                        <li>Support Vector Regressor</li>
+                        <li>Neural Network Regression</li>
+                    </ul>
+                    <p><strong>Metrics:</strong> MAE, RMSE, R², MAPE</p>
+                </div>
+                
+                <div class="model-card">
+                    <h3>Time Series Approach</h3>
+                    <p><strong>Target:</strong> Forecast future crowdedness patterns</p>
+                    <p><strong>Models to try:</strong></p>
+                    <ul>
+                        <li>ARIMA/SARIMA</li>
+                        <li>Prophet</li>
+                        <li>LSTM/GRU Networks</li>
+                        <li>Time Series Forests</li>
+                        <li>Transformer-based models</li>
+                    </ul>
+                    <p><strong>Metrics:</strong> SMAPE, MASE, Forecast Accuracy</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Production Requirements</h2>
+            
+            <h3>Real-time Prediction System:</h3>
+            <ul class="task-list">
+                <li><strong>API Endpoints:</strong> REST API for predictions</li>
+                <li><strong>Model Serving:</strong> FastAPI or Flask deployment</li>
+                <li><strong>Monitoring:</strong> Model performance tracking</li>
+                <li><strong>Retraining:</strong> Automated retraining pipeline</li>
+                <li><strong>A/B Testing:</strong> Framework for model comparison</li>
+            </ul>
+            
+            <h3>Infrastructure Requirements:</h3>
+            <div class="card">
+                <ul>
+                    <li><strong>Data Pipeline:</strong> Extracting data from the database will be handled by AAQT, the team may start with the CSV file.</li>
+                    <li><strong>Model Registry:</strong> MLflow for model tracking and monitoring</li>
+                    <li><strong>Containerization:</strong> Docker for deployment</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Deliverables Timeline</h2>
+            
+            <table>
+                <tr>
+                    <th>Phase</th>
+                    <th>Duration</th>
+                    <th>Deliverables</th>
+                    <th>Success Criteria</th>
+                </tr>
+                <tr>
+                    <td>Phase 1: EDA & Cleaning</td>
+                    <td>1-2 weeks</td>
+                    <td>
+                        - EDA report with insights<br>
+                        - Data cleaning pipeline<br>
+                        - Feature engineering plan
+                    </td>
+                    <td>Clean, validated dataset ready for modeling</td>
+                </tr>
+                <tr>
+                    <td>Phase 2: Model Development</td>
+                    <td>2-3 weeks</td>
+                    <td>
+                        - 3+ models per approach<br>
+                        - Model comparison report<br>
+                        - Best model selection
+                    </td>
+                    <td>Models achieving >85% accuracy</td>
+                </tr>
+                <tr>
+                    <td>Phase 3: Production Pipeline</td>
+                    <td>1-2 weeks</td>
+                    <td>
+                        - API endpoints<br>
+                        - Model serving infrastructure<br>
+                        - Monitoring setup
+                    </td>
+                    <td>System response time < 100ms</td>
+                </tr>
+                <tr>
+                    <td>Phase 4: Testing & Deployment & Improvements</td>
+                    <td>1-3 weeks</td>
+                    <td>
+                        - Load testing results<br>
+                        - A/B testing framework<br>
+                        - Production deployment<br>
+                        - Code improvements
+                    </td>
+                    <td>System running smoothly in production</td>
+                </tr>
+            </table>
+        </div>
+        <div class="warning">
+            <h4>Things to note:</h4>
+            <ol>
+                <li><strong>Model Interpretability:</strong> Business stakeholders need to understand predictions</li>
+                <li><strong>Real-time Performance:</strong> Predictions must be generated within 100ms</li>
+                <li><strong>Scalability:</strong> System must handle growth to 100+ locations</li>
+                <li><strong>Maintainability:</strong> Clear documentation and modular code</li>
+                <li><strong>Monitoring:</strong> Proactive alerting for model drift and data quality issues</li>
+            </ol>
+        </div>
+        
+        <div class="footer">
+            <p>Confidential - For Internal Use Only</p>
+            <p>© 2025 AAQT. All rights reserved.</p>
+            <button class="no-print" onclick="window.print()">🖨️ Print/Download PDF</button>
+        </div>
+    </div>
+    
+    <script>
+        
+        // Print functionality
+        window.onbeforeprint = function() {
+            document.querySelector('.no-print').style.display = 'none';
+        };
+        
+        window.onafterprint = function() {
+            document.querySelector('.no-print').style.display = 'block';
+        };
+    </script>
+</body>
+</html>

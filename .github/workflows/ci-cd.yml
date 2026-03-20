@@ -34,7 +34,7 @@ jobs:
               env:
                   PYTHONPATH: .
               run: |
-                  python -m pytest tests/ -v
+                  python -m pytest backend/tests/ -v
 
     docker-build:
         needs: lint-and-test

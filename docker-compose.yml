@@ -1,0 +1,62 @@
+services:
+  # Backend API Server
+  backend:
+    build: .
+    volumes:
+      - ./src/backend:/app/src/backend
+    environment:
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
+      - MODEL_PATH=ml/models/xgboost_crowdedness_model.pkl
+    ports:
+      - "8000:8000"
+    command: uvicorn src.backend.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - mlflow_ui
+
+  # Simple Web Frontend
+  frontend:
+    build: ./src/frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+  # MLflow Tracking Server
+  mlflow_ui:
+    build: .
+    ports:
+      - "5000:5000"
+    command: >
+      mlflow server 
+      --host 0.0.0.0 
+      --port 5000 
+      --backend-store-uri ${MLFLOW_TRACKING_URI}
+      --default-artifact-root ./artifacts
+
+  # Airflow Scheduler & Webserver (Simplified for Dev)
+  airflow:
+    build: .
+    volumes:
+      - ./airflow/dags:/app/dags
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
+    ports:
+      - "8080:8080"
+    command: airflow standalone
+
+  # The Worker/Execution service
+  app:
+    build: .
+    environment:
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
+    command: python data-pipeline/scripts/create_tables.py # Example entrypoint
+    depends_on:
+      - mlflow_ui

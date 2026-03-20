@@ -1,0 +1,20 @@
+# --- Git ---
+.git
+.gitignore
+
+# --- Secrets ---
+.env
+.env.example
+
+# --- Python ---
+__pycache__/
+*.pyc
+venv/
+.pytest_cache/
+
+# --- Documentation ---
+README.md
+docs/
+
+# --- Local Data ---
+*.csv

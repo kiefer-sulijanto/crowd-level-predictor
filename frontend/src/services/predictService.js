@@ -15,10 +15,53 @@ WINDOW → BINS MAPPING
 ------------------------------------
 */
 const WINDOW_TO_BINS = {
-  "30m": 1,
-  "1h": 2,
+  "30m": 6,
+  "1h": 6,
   "3h": 6
 };
+
+/*
+------------------------------------
+GENERATE TIME SERIES
+------------------------------------
+*/
+function generateTimeSeries(timeWindow, predictions) {
+  const now = new Date();
+
+  let stepMinutes = 10;
+
+  if (timeWindow === "30m") stepMinutes = 5;
+  if (timeWindow === "1h") stepMinutes = 10;
+  if (timeWindow === "3h") stepMinutes = 30;
+
+  let totalPoints = 6;
+
+  if (timeWindow === "30m") totalPoints = 6;
+  if (timeWindow === "1h") totalPoints = 6;
+  if (timeWindow === "3h") totalPoints = 6;
+
+  const history = [];
+
+  for (let i = totalPoints; i >= 0; i--) {
+    const t = new Date(now);
+    t.setMinutes(now.getMinutes() - i * stepMinutes);
+
+    const base =
+      predictions[totalPoints - 1 - i]?.crowdedness_score ??
+      predictions[0]?.crowdedness_score ??
+      0;
+
+    // small smooth variation (curve effect)
+    const variation = Math.sin(i / 2) * 0.03;
+
+    history.push({
+      time: t.toISOString(),
+      value: Math.max(0, Math.min(1, base + variation))
+    });
+  }
+
+  return history;
+}
 
 
 /*

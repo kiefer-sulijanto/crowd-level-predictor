@@ -9,6 +9,7 @@ function sanitizePayload(payload) {
     humidity: Math.max(0, Math.min(100, payload.humidity))
   };
 }
+
 /*
 ------------------------------------
 WINDOW → BINS MAPPING
@@ -63,14 +64,12 @@ function generateTimeSeries(timeWindow, predictions) {
   return history;
 }
 
-
 /*
 ------------------------------------
 GET LOCATIONS
 ------------------------------------
 */
 async function getLocations() {
-
   const locations = [
     { id: "0", name: "Sembawang Eating House", freq: 4500 },
     { id: "1", name: "Kenn's Foodhouse", freq: 3800 },
@@ -98,9 +97,7 @@ async function getLocations() {
     locations,
     defaultLocationId: ""
   };
-
 }
-
 
 /*
 ------------------------------------
@@ -108,7 +105,6 @@ GET PREDICTION
 ------------------------------------
 */
 async function getPrediction(timeWindow, locationId, features = {}) {
-
   const { locations } = await getLocations();
 
   const selectedLocation = locations.find(
@@ -127,7 +123,6 @@ async function getPrediction(timeWindow, locationId, features = {}) {
     weather: "cloudy",
     is_public_holiday: 0,
     bins_ahead: binsAhead,
-
     ...features
   };
 
@@ -149,7 +144,6 @@ async function getPrediction(timeWindow, locationId, features = {}) {
   }
 
   const data = await res.json();
-
   const predictions = data.predictions || [];
 
   return {
@@ -159,10 +153,7 @@ async function getPrediction(timeWindow, locationId, features = {}) {
 
     score: predictions?.[0]?.crowdedness_score || 0,
 
-    history: predictions.map((p) => ({
-      time: p.time_bin,
-      value: p.crowdedness_score
-    })),
+    history: generateTimeSeries(timeWindow, predictions),
 
     meta: {
       modelVersion: "GradientBoosting_v1",
@@ -171,7 +162,6 @@ async function getPrediction(timeWindow, locationId, features = {}) {
       lastUpdated: new Date().toISOString()
     }
   };
-
 }
 
 export default { getLocations, getPrediction };
